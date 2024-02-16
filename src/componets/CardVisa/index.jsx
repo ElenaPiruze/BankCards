@@ -4,6 +4,8 @@ import visaLogo from 	"../assets/visa-logo.svg"
 import editIcon from "../assets/edit-icon.svg"
 
 function CardVisa({cvc,expires,name,number}) {
+
+    const numberChunks = number.match(/.{1,4}/g);
     return (
         <div className="bg-[#5ecd88] h-[250px] w-full rounded-2xl relative overflow-hidden z-10 mb-5">
             <div className="p-7 flex flex-col h-full">
@@ -25,7 +27,13 @@ function CardVisa({cvc,expires,name,number}) {
             <div className="mr-auto flex">
                 <div className="text-white mr-5">
                <p className=" text-lg font-bold">{name}</p>
-               <p className=" font-bold flex"><span className="block mr-3">5532</span>  <span className="block mr-3">1234</span> <span className="block mr-3">5545</span> <span>8014</span></p>
+               <p className=" font-bold flex">
+                {numberChunks.map((chunk, index) => (
+                  <span key={index} className="block mr-3 last:mr-0">
+                    {chunk}
+                  </span>
+                ))}
+              </p>
                </div>
              
             </div>

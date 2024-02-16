@@ -1,30 +1,63 @@
-import React, { useState } from "react";
-import  CardMaster  from '../CardMaster';
-import CardVisa  from '../CardVisa';
-import {data} from '../../mockedData/card_holders'
+import React, { useState, useEffect } from "react";
+import CardMaster from "../CardMaster";
+import CardVisa from "../CardVisa";
+import { data as initialData } from "../../mockedData/card_holders"; 
+import ModalAdd from "../ModalAdd";
 
 function ListCard() {
-    const [cards, setCards] = useState([{cvc:"009",expires:"08/21",name:"John Cabruci",number:[5532, 1234, 5545, 8014 ]},
-    {cvc:"129",expires:"12/24",name:"John Cabruci",number:[1923, 1231, 8892, 2381 ]}]);
+  const [data, setData] = useState(initialData);
+  const [showMaster, setShowMaster] = useState([]);
+  const [showVisa, setShowVisa] = useState([]);
 
-    console.log(data);
-    return (
-        <div className='my-10' >
- <div className="mb-5"> 
-{cards.map((card, index) => (
-  <CardMaster key={index} cvc={card.cvc} expires={card.expires} name={card.name} number={card.number}/>
-))}
-      
-      
+
+  console.log(data);
+  useEffect(() => {
+    const masterCards = data.filter((card) => isMasterCard(card.card_number));
+    const visaCards = data.filter((card) => isVisaCard(card.card_number));
+
+    setShowMaster(masterCards);
+    setShowVisa(visaCards);
+  }, [data]);
+
+  const isMasterCard = (cardNumber) => {
+    return cardNumber.startsWith("5") && cardNumber.length === 16;
+  };
+
+  const isVisaCard = (cardNumber) => {
+    return cardNumber.startsWith("4") && cardNumber.length === 16;
+  };
+
+  const addCard = (newCard) => {
+    setData([...data, newCard]); // Add the new card to the data state
+  };
+  return (
+    <div className="my-10">
+      <div className="mb-5">
+        {showMaster &&
+          showMaster?.map((card, index) => (
+            <CardMaster
+              key={index}
+              cvc={card.cvc}
+              expires={card.expiry_date}
+              name={card.name_in_card}
+              number={card.card_number}
+            />
+          ))}
       </div>
-      {cards.map((card, index) => (
-  <CardVisa key={index} cvc={card.cvc} expires={card.expires} name={card.name} number={card.number}/>
-))}
-      <button onClick={() => setCards(data)} className="bg-purple-600 text-white w-full py-3 rounded-lg">Add new card</button>
-          
+      {showVisa &&
+        showVisa?.map((card, index) => (
+          <CardVisa
+            key={index}
+            cvc={card.cvc}
+            expires={card.expiry_date}
+            name={card.name_in_card}
+            number={card.card_number}
+          />
+        ))}
 
-        </div>)
-      
+      <ModalAdd addCard={addCard}/>
+    </div>
+  );
 }
 
-export default ListCard
+export default ListCard;
