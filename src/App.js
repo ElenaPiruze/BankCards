@@ -1,23 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
+import ListCard from './componets/ListCard';
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="px-4 max-w-[425px] mx-auto">
+      <h1 className="text-6xl text-purple font-bold font-circularPro">Your Cards</h1>
+      <h3 className="text-small text-darkGrey font-circularPro">Add, edit, or delete your cards at any time</h3>cd
+     <ListCard />
+     
     </div>
   );
 }
