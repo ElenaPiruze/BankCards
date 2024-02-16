@@ -17,7 +17,9 @@ function ListCard() {
       
       
       </div>
-      <CardVisa/>
+      {cards.map((card, index) => (
+  <CardVisa key={index} cvc={card.cvc} expires={card.expires} name={card.name} number={card.number}/>
+))}
       <button onClick={() => setCards(data)} className="bg-purple-600 text-white w-full py-3 rounded-lg">Add new card</button>
           
 
