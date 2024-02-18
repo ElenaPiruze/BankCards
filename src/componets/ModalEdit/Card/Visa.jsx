@@ -1,12 +1,9 @@
 import React from "react";
-import cardBg from "../assets/card-background-shapeGreen.svg";
-import visaLogo from "../assets/visa-logo.svg";
-import editIcon from "../assets/edit-icon.svg";
-import ModalEdit from "../ModalEdit";
+import cardBg from "../../assets/card-background-shapeGreen.svg";
+import visaLogo from "../../assets/visa-logo.svg";
 
-function CardVisa({ cvc, expires, name, number, index, editCard, card_is }) {
+function Visa({ cvc, expires, name, number }) {
   const numberChunks = number.match(/.{1,4}/g);
-
   return (
     <div className="bg-[#5ecd88] h-[250px] w-full rounded-2xl relative overflow-hidden z-10 mb-5">
       <div className="p-7 flex flex-col h-full">
@@ -36,18 +33,6 @@ function CardVisa({ cvc, expires, name, number, index, editCard, card_is }) {
               </p>
             </div>
           </div>
-          <div className="flex items-end">
-            {" "}
-            <ModalEdit
-              card_is={card_is}
-              editCard={editCard}
-              cvc={cvc}
-              expires={expires}
-              name={name}
-              number={number}
-              index={index}
-            />
-          </div>
         </div>
       </div>
 
@@ -60,4 +45,4 @@ function CardVisa({ cvc, expires, name, number, index, editCard, card_is }) {
   );
 }
 
-export default CardVisa;
+export default Visa;

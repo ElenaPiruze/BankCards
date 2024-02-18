@@ -2,9 +2,9 @@ import React from "react";
 import cardBg from "../assets/card-background-shape.svg";
 import masterLogo from "../assets/mastercard-logo.svg";
 import editIcon from "../assets/edit-icon.svg";
+import ModalEdit from "../ModalEdit";
 
-function CardMaster({ cvc, expires, name, number }) {
-  
+function CardMaster({ editCard, cvc, expires, name, number, index, card_is }) {
   const numberChunks = number.match(/.{1,4}/g);
 
   return (
@@ -36,9 +36,18 @@ function CardMaster({ cvc, expires, name, number }) {
               </p>
             </div>
           </div>
-          <button className="flex items-end">
-            <img src={editIcon} alt="Edit Icon" className="w-5 h-5" />
-          </button>
+          <div className="flex items-end">
+            {" "}
+            <ModalEdit
+              card_is={card_is}
+              editCard={editCard}
+              cvc={cvc}
+              expires={expires}
+              name={name}
+              number={number}
+              index={index}
+            />
+          </div>
         </div>
       </div>
       <img

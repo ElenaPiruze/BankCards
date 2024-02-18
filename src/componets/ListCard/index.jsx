@@ -1,61 +1,62 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import CardMaster from "../CardMaster";
 import CardVisa from "../CardVisa";
-import { data as initialData } from "../../mockedData/card_holders"; 
+import { data as initialData } from "../../mockedData/card_holders";
 import ModalAdd from "../ModalAdd";
 
 function ListCard() {
-  const [data, setData] = useState(initialData);
-  const [showMaster, setShowMaster] = useState([]);
-  const [showVisa, setShowVisa] = useState([]);
-
+  const [data, setData] = useState([]);
 
   console.log(data);
-  useEffect(() => {
-    const masterCards = data.filter((card) => isMasterCard(card.card_number));
-    const visaCards = data.filter((card) => isVisaCard(card.card_number));
-
-    setShowMaster(masterCards);
-    setShowVisa(visaCards);
-  }, [data]);
-
-  const isMasterCard = (cardNumber) => {
-    return cardNumber.startsWith("5") && cardNumber.length === 16;
-  };
-
-  const isVisaCard = (cardNumber) => {
-    return cardNumber.startsWith("4") && cardNumber.length === 16;
-  };
 
   const addCard = (newCard) => {
-    setData([...data, newCard]); // Add the new card to the data state
+    if (data) {
+      setData([...data, newCard]);
+    } else {
+      setData([newCard]);
+    }
   };
+
+  const editCard = (index, updatedCard) => {
+    const newData = [...data];
+    newData[index] = updatedCard;
+    setData(newData);
+  };
+
   return (
     <div className="my-10">
-      <div className="mb-5">
-        {showMaster &&
-          showMaster?.map((card, index) => (
-            <CardMaster
-              key={index}
-              cvc={card.cvc}
-              expires={card.expiry_date}
-              name={card.name_in_card}
-              number={card.card_number}
-            />
-          ))}
-      </div>
-      {showVisa &&
-        showVisa?.map((card, index) => (
-          <CardVisa
-            key={index}
-            cvc={card.cvc}
-            expires={card.expiry_date}
-            name={card.name_in_card}
-            number={card.card_number}
-          />
+      {data &&
+        data?.map((card, index) => (
+          <>
+            {card.card_is === "Mastercard" ? (
+              <div className="mb-5">
+                <CardMaster
+                  key={index}
+                  index={index}
+                  cvc={card.cvc}
+                  expires={card.expiry_date}
+                  name={card.name_in_card}
+                  number={card.card_number}
+                  editCard={editCard}
+                  card_is={card.card_is}
+                />
+              </div>
+            ) : (
+              <CardVisa
+                key={index}
+                index={index}
+                cvc={card.cvc}
+                expires={card.expiry_date}
+                name={card.name_in_card}
+                number={card.card_number}
+                editCard={editCard}
+                card_is={card.card_is}
+              />
+            )}
+          </>
         ))}
 
-      <ModalAdd addCard={addCard}/>
+      <ModalAdd addCard={addCard} />
     </div>
   );
 }

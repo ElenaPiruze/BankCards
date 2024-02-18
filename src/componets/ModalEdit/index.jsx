@@ -1,19 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import close from "../assets/close.svg";
 import formError from "../assets/form-error.svg";
-import formSuccess from "../assets/form-success.svg";
+import editIcon from "../assets/edit-icon.svg";
+import Visa from "./Card/Visa";
+import Master from "./Card/Master";
 
-function ModalAdd({ addCard }) {
+function ModalEdit({ editCard, name, cvc, expires, number, index, card_is }) {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
-    name_in_card: "",
-    card_number: "",
-    expiry_date: "",
-    cvc: "",
+    name_in_card: name || "",
+    card_number: number || "",
+    expiry_date: expires || "",
+    cvc: cvc || "",
     card_is: "",
   });
   const [errors, setErrors] = useState({});
-  const [isInputEdited, setIsInputEdited] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      name_in_card: name || "",
+      card_number: number || "",
+      expiry_date: expires || "",
+      cvc: cvc || "",
+      card_is: "",
+    });
+  }, [name, cvc, expires, number]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +36,6 @@ function ModalAdd({ addCard }) {
       ...errors,
       [name]: "",
     });
-    setIsInputEdited(true);
   };
 
   const handleSubmit = (e) => {
@@ -67,20 +77,30 @@ function ModalAdd({ addCard }) {
     } else if (!/^\d{3}$/.test(formData.cvc)) {
       newErrors.cvc = "CVC must contain exactly 3 digits";
     }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    addCard(formData);
-    console.log(formData);
+
+    editCard(index, formData);
+
     setFormData({
       name_in_card: "",
       card_number: "",
       expiry_date: "",
       cvc: "",
-      card_is: "",
     });
+
     setShow(false);
+  };
+  const handleDelete = () => {
+    setFormData({
+      name_in_card: "",
+      card_number: "",
+      expiry_date: "",
+      cvc: "",
+    });
   };
 
   const isMasterOrVisaCard = (cardNumber) => {
@@ -89,7 +109,6 @@ function ModalAdd({ addCard }) {
 
     return mastercardRegex.test(cardNumber) || visaRegex.test(cardNumber);
   };
-
   const getCardType = (cardNumber) => {
     const mastercardRegex = /^(5[1-5][0-9]{14})$/;
     const visaRegex = /^(4[0-9]{15})$/;
@@ -105,11 +124,8 @@ function ModalAdd({ addCard }) {
 
   return (
     <>
-      <button
-        onClick={() => setShow(true)}
-        className="bg-purple text-white w-full py-3 rounded-lg"
-      >
-        Add new card
+      <button onClick={() => setShow(true)} className=" w-full py-3 rounded-lg">
+        <img src={editIcon} alt="Edit Icon" className="w-5 h-5" />
       </button>
 
       <div
@@ -128,26 +144,25 @@ function ModalAdd({ addCard }) {
               {" "}
               <img src={close} alt="close" />
             </button>
+            {card_is === "Mastercard" ? (
+              <Master number={number} cvc={cvc} expires={expires} name={name} />
+            ) : (
+              <Visa number={number} cvc={cvc} expires={expires} name={name} />
+            )}
             <form onSubmit={handleSubmit} className="mb-10">
-              <h2 className="text-2xl font-bold mb-10">
-                Add your card details
+              <h2 className="text-2xl font-bold mb-10 text-start">
+                Edit your card
               </h2>
-              <div className="flex flex-col w-full mb-10">
+              <div className="flex flex-col  w-full mb-10">
                 <div className="relative h-11 w-full mb-10">
                   <input
                     type="text"
                     name="name_in_card"
                     value={formData.name_in_card}
-                    placeholder="John Doe"
                     onChange={handleChange}
                     className={`peer h-full w-full ${
                       errors.name_in_card ? "border-red" : "border-black"
-                    }${
-                      formData.name_in_card.trim()
-                        ? "border-green"
-                        : "border-black"
-                    } 
-                    peer h-full w-full border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans font-bold text-green outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-transparent"`}
+                    } border-b  bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-black outline outline-0 transition-all  focus:border-gray-900 focus:outline-0 disabled:border-0 `}
                   />
                   {errors.name_in_card && (
                     <img
@@ -157,27 +172,21 @@ function ModalAdd({ addCard }) {
                     />
                   )}
                   {errors.name_in_card && (
-                    <p className="text-red">{errors.name_in_card}</p>
-                  )}
-                  {formData.name_in_card.trim() && (
-                    <img
-                      src={formSuccess}
-                      alt="Form Success"
-                      className="absolute right-0 bottom-2 text-green"
-                    />
+                    <p className="text-red text-start">{errors.name_in_card}</p>
                   )}
                   <label className="after:content[' '] pointer-events-none absolute left-0  -top-2.5 flex h-full w-full select-none !overflow-visible truncate text-sm font-normal leading-tight text-gray-500 transition-all after:absolute after:-bottom-2.5 after:block after:w-full after:scale-x-0 after:border-b-2 after:border-gray-500 after:transition-transform after:duration-300 peer-placeholder-shown:leading-tight peer-placeholder-shown:text-blue-gray-500 peer-focus:text-sm peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:after:scale-x-100 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                     Name in card
                   </label>
                 </div>
-                <div className="relative w-full mb-10">
+                <div className="relative h-11 w-full mb-10">
                   <input
                     type="text"
                     name="card_number"
                     value={formData.card_number}
-                    placeholder="0000 0000 0000 0000"
                     onChange={handleChange}
-                    className="peer h-full w-full border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans text-sm font-bold text-green outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    className={`peer h-full w-full border-b ${
+                      errors.card_number ? "border-red" : "border-black"
+                    } bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50`}
                   />
                   {errors.card_number && (
                     <img
@@ -187,28 +196,21 @@ function ModalAdd({ addCard }) {
                     />
                   )}
                   {errors.card_number && (
-                    <p className="text-red">{errors.card_number}</p>
-                  )}
-
-                  {formData.card_number.trim() && (
-                    <img
-                      src={formSuccess}
-                      alt="Form Success"
-                      className="absolute right-0 bottom-2 text-green"
-                    />
+                    <p className="text-red text-start">{errors.card_number}</p>
                   )}
                   <label className="after:content[' '] pointer-events-none absolute left-0  -top-2.5 flex h-full w-full select-none !overflow-visible truncate text-sm font-normal leading-tight text-gray-500 transition-all after:absolute after:-bottom-2.5 after:block after:w-full after:scale-x-0 after:border-b-2 after:border-gray-500 after:transition-transform after:duration-300 peer-placeholder-shown:leading-tight peer-placeholder-shown:text-blue-gray-500 peer-focus:text-sm peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:after:scale-x-100 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                     Card number
                   </label>
                 </div>
-                <div className="relative  w-full mb-10">
+                <div className="relative h-11 w-full mb-10">
                   <input
                     type="text"
                     name="expiry_date"
                     value={formData.expiry_date}
-                    placeholder="00/00"
                     onChange={handleChange}
-                    className="peer h-full w-full border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans text-sm font-bold text-green outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    className={`peer h-full w-full border-b ${
+                      errors.expiry_date ? "border-red" : "border-black"
+                    } bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50`}
                   />
                   {errors.expiry_date && (
                     <img
@@ -218,28 +220,21 @@ function ModalAdd({ addCard }) {
                     />
                   )}
                   {errors.expiry_date && (
-                    <p className="text-red">{errors.expiry_date}</p>
-                  )}
-
-                  {formData.expiry_date.trim() && (
-                    <img
-                      src={formSuccess}
-                      alt="Form Success"
-                      className="absolute right-0 bottom-2 text-green"
-                    />
+                    <p className="text-red text-start">{errors.expiry_date}</p>
                   )}
                   <label className="after:content[' '] pointer-events-none absolute left-0  -top-2.5 flex h-full w-full select-none !overflow-visible truncate text-sm font-normal leading-tight text-gray-500 transition-all after:absolute after:-bottom-2.5 after:block after:w-full after:scale-x-0 after:border-b-2 after:border-gray-500 after:transition-transform after:duration-300 peer-placeholder-shown:leading-tight peer-placeholder-shown:text-blue-gray-500 peer-focus:text-sm peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:after:scale-x-100 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                     Expiry date
                   </label>
                 </div>
-                <div className="relative  w-full ">
+                <div className="relative h-11 w-full ">
                   <input
                     type="text"
                     name="cvc"
                     value={formData.cvc}
-                    placeholder="000"
                     onChange={handleChange}
-                    className="peer h-full w-full border-b border-blue-gray-200 bg-transparent pt-4 pb-1.5 font-sans text- font-bold text-green outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    className={`peer h-full w-full border-b ${
+                      errors.cvc ? "border-red" : "border-black"
+                    } bg-transparent pt-4 pb-1.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border-blue-gray-200 focus:border-gray-900 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50`}
                   />
                   {errors.cvc && (
                     <img
@@ -248,14 +243,8 @@ function ModalAdd({ addCard }) {
                       className="absolute right-0 bottom-2"
                     />
                   )}
-                  {errors.cvc && <p className="text-red">{errors.cvc}</p>}
-
-                  {formData.cvc.trim() && (
-                    <img
-                      src={formSuccess}
-                      alt="Form Success"
-                      className="absolute right-0 bottom-2 text-green"
-                    />
+                  {errors.cvc && (
+                    <p className="text-red text-start">{errors.cvc}</p>
                   )}
                   <label className="after:content[' '] pointer-events-none absolute left-0  -top-2.5 flex h-full w-full select-none !overflow-visible truncate text-sm font-normal gray-500 transition-all after:absolute after:-bottom-2.5 after:block after:w-full after:scale-x-0 after:border-b-2 after:border-gray-500 after:transition-transform after:duration-300 peer-placeholder-shown:leading-tight peer-placeholder-shown:text-blue-gray-500 peer-focus:text-sm peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:after:scale-x-100 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                     CVC (Security Code)
@@ -264,10 +253,15 @@ function ModalAdd({ addCard }) {
               </div>
               <button
                 type="submit"
-                disabled={!isInputEdited}
-                className="bg-purple text-white w-full py-3 rounded-lg disabled:opacity-30 disabled:bg-grey "
+                className="bg-purple text-white w-full py-3 rounded-lg"
               >
                 Confirm
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-white text-whiteGrey w-full py-3 rounded-lg"
+              >
+                Delete card
               </button>
             </form>
           </div>
@@ -277,4 +271,4 @@ function ModalAdd({ addCard }) {
   );
 }
 
-export default ModalAdd;
+export default ModalEdit;
